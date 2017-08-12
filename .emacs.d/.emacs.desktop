@@ -1,0 +1,30 @@
+;; -*- mode: emacs-lisp; coding: emacs-mule; -*-
+;; --------------------------------------------------------------------------
+;; Desktop File for Emacs
+;; --------------------------------------------------------------------------
+;; Created Sat Jan 30 03:03:29 2016
+;; Desktop file format version 206
+;; Emacs version 24.4.1
+
+;; Global section:
+(setq desktop-saved-frameset [frameset 1 (22188 28241 698239 930000) (desktop . "206") "patrick@navi" nil nil ((((font-backend xft x) (font-parameter . "DejaVu Sans Mono-10.5") (font . "-unknown-DejaVu Sans Mono-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1") (border-width . 0) (internal-border-width . 0) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (foreground-color . "#F8F8F8") (background-color . "#0C1021") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (scroll-bar-foreground) (scroll-bar-background) (menu-bar-lines . 0) (tool-bar-lines . 0) (title) (wait-for-wm . t) (fullscreen . maximized) (tool-bar-position . top) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 0) (alpha) (display-type . color) (background-mode . dark) (cursor-color . "#FFFFFF") (visibility . t) (sticky) (frameset--id . "C539-56B4-F4C6-A1D1") (frameset--mini t . t) (modeline . t) (minibuffer . t) (unsplittable) (icon-name) (display . ":0") (explicit-name) (height . 62) (width . 232) (left . 47) (top . 24)) ((min-height . 4) (min-width . 20) (min-height-ignore . 3) (min-width-ignore . 8) (min-height-safe . 1) (min-width-safe . 4) (min-pixel-height . 68) (min-pixel-width . 160) (min-pixel-height-ignore . 51) (min-pixel-width-ignore . 64) (min-pixel-height-safe . 17) (min-pixel-width-safe . 32)) hc (pixel-width . 1873) (pixel-height . 1039) (total-width . 234) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 936) (pixel-height . 1039) (total-width . 117) (total-height . 61) (normal-height . 1.0) (normal-width . 0.5) (buffer ".emacs" (selected . t) (hscroll . 0) (fringes 8 8 nil) (margins 3) (scroll-bars 0 0 t nil) (vscroll . 0) (dedicated) (point . 730) (start . 1))) (leaf (last . t) (pixel-width . 937) (pixel-height . 1039) (total-width . 117) (total-height . 61) (normal-height . 1.0) (normal-width . 0.5) (buffer "*scratch*" (selected) (hscroll . 0) (fringes 8 8 nil) (margins nil) (scroll-bars 0 0 t nil) (vscroll . 0) (dedicated) (point . 1) (start . 1)))))])
+(setq desktop-missing-file-warning nil)
+(setq tags-file-name nil)
+(setq tags-table-list nil)
+(setq search-ring '("print" "nextPow2" "print" "print_arr" "exclusive_scan" "find_repeat" "exclusive_scan" "find_repeats" "blocks" "print" "0" "length" "N" "todo" "totalBytes" "cudaMem"))
+(setq regexp-search-ring nil)
+(setq register-alist nil)
+(setq file-name-history '("~/.emacs" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/scan/Makefile" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/scan/scan.cu" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/scan/log" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/scan/scan.cu" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/scan/log" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/saxpy/saxpy.cu" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/scan/scan.cu" "~" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/saxpy/log" "/ssh:phn@ghc46.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/saxpy/saxpy.cu" "~/Desktop/a.c" "~/Desktop/karaoke" "/ssh:phn@unix.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/saxpy/saxpy.cu" "/ssh:phn@unix.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment2/scan/scan.cu" "/ssh:phn@unix.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/.bashrc" "~/Documents/Spring 2016/Lambda.tex" "~/Documents/Spring 2016/80411/hw2/hw2.tex" "~/Documents/Spring 2016/15453/ack.java" "~/Documents/Spring 2016/15453/ack.hs" "~/Documents/Spring 2016/15418/Assn1/writeup.tex" "~/Documents/Spring 2016/15418/Assn1/writeup.pdf" "/ssh:phn@ghc50.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment1/prog5_saxpy/saxpy.ispc" "/ssh:phn@ghc50.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment1/prog4_sqrt/main.cpp" "/ssh:phn@ghc50.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment1/prog4_sqrt/sqrt.ispc" "~/Documents/Spring 2016/15418/Assn1/hw1.tex" "/ssh:phn@ghc50.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment1/prog3_mandelbrot_ispc/mandelbrot.ispc" "~/Documents/Spring 2016/15418/Assn1/hw1.tex" "/ssh:phn@ghc50.ghc.andrew.cmu.edu:/afs/andrew.cmu.edu/usr24/phn/private/418/assignment1/prog2_vecintrin/log" "~/Desktop/log"))
+
+;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 206
+  "/home/patrick/.emacs"
+  ".emacs"
+  'emacs-lisp-mode
+  '(linum-mode)
+  730
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
