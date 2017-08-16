@@ -45,7 +45,15 @@
    ["dark red" "red" "green" "yellow" "deep sky blue" "magenta" "cyan" "tan"])
  '(custom-safe-themes
    (quote
-    ("f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default))))
+    ("f641bdb1b534a06baa5e05ffdb5039fb265fde2764fbfd9a90b0d23b75f3936b" default)))
+ '(haskell-process-auto-import-loaded-modules t)
+ '(haskell-process-log t)
+ '(haskell-process-suggest-remove-import-lines t)
+ '(haskell-process-type (quote stack-ghci))
+ '(haskell-tags-on-save t)
+ '(package-selected-packages
+   (quote
+    (intero sml-mode latex-preview-pane ghc flymake-hlint ensime auctex ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -289,40 +297,75 @@
 ;;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
 
 
-;;haskell
+;; ;;haskell
+;; ;;https://github.com/serras/emacs-haskell-tutorial/blob/master/tutorial.md
+;; ;;cabal dependencies: happy, hasktags, stylish-haskell
 (add-hook 'haskell-mode-hook 'haskell-indentation-mode)
-(require 'haskell-interactive-mode)
-(require 'haskell-process)
-(add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-(custom-set-variables
-  '(haskell-process-suggest-remove-import-lines t)
-  '(haskell-process-auto-import-loaded-modules t)
-  '(haskell-process-log t))
-(eval-after-load 'haskell-mode '(progn
-(define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reloa)
-  (define-key haskell-mode-map (kbd "C-`") 'haskell-interactive-bring)
-  (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
-  (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
-  (define-key haskell-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
-  (define-key haskell-mode-map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
-  (define-key haskell-mode-map (kbd "C-c c") 'haskell-process-cabal)
-  (define-key haskell-mode-map (kbd "SPC") 'haskell-mode-contextual-space)
-  (define-key haskell-mode-map (kbd "C-c C-o") 'haskell-compile)))
-(eval-after-load 'haskell-cabal '(progn
-  (define-key haskell-cabal-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
-  (define-key haskell-cabal-mode-map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
-  (define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
-  (define-key haskell-cabal-mode-map (kbd "C-c c") 'haskell-process-cabal)
-  (define-key haskell-cabal-mode-map (kbd "C-c C-o") 'haskell-compile)))
+;; (require 'haskell-interactive-mode)
+;; (require 'haskell-process)
+;; (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+;; (custom-set-variables
+;;   '(haskell-process-suggest-remove-import-lines t)
+;;   '(haskell-process-auto-import-loaded-modules t)
+;;   '(haskell-process-log t))
+;; ;; (eval-after-load 'haskell-mode '(haskell-session-change))
+;; (eval-after-load 'haskell-mode '(progn
+;;   (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reload)
+;;   (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
+;;   (define-key haskell-mode-map (kbd "C-c C-n C-t") 'haskell-process-do-type)
+;;   (define-key haskell-mode-map (kbd "C-c C-n C-i") 'haskell-process-do-info)
+;;   (define-key haskell-mode-map (kbd "C-c C-n C-c") 'haskell-process-cabal-build)
+;;   (define-key haskell-mode-map (kbd "C-c C-n c") 'haskell-process-cabal)))
+;; (eval-after-load 'haskell-cabal '(progn
+;;   (define-key haskell-cabal-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
+;;   (define-key haskell-cabal-mode-map (kbd "C-c C-k") 'haskell-interactive-mode-clear)
+;;   (define-key haskell-cabal-mode-map (kbd "C-c C-c") 'haskell-process-cabal-build)
+;;   (define-key haskell-cabal-mode-map (kbd "C-c c") 'haskell-process-cabal)))
 
-(let ((my-cabal-path (expand-file-name "~/.cabal/bin")))
-  (setenv "PATH" (concat my-cabal-path ":" (getenv "PATH")))
-  (add-to-list 'exec-path my-cabal-path))
+;; ;; (let ((my-cabal-path (expand-file-name "~/.cabal/bin")))
+;;   ;; (setenv "PATH" (concat my-cabal-path ":" (getenv "PATH")))
+;;   ;; (add-to-list 'exec-path my-cabal-path))
 
-(autoload 'ghc-init "ghc" nil t)
-(autoload 'ghc-debug "ghc" nil t)
-;;(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
-;;(add-hook 'haskell-mode-hook 'flymake-hlint-load)
+;; (let ((my-cabal-path (expand-file-name "~/.cabal/bin")))
+;;   (setenv "PATH" (concat my-cabal-path ";" (getenv "PATH")))
+;;   (add-to-list 'exec-path my-cabal-path))
+;; (custom-set-variables '(haskell-tags-on-save t))
+
+;; (autoload 'ghc-init "ghc" nil t)
+;; (autoload 'ghc-debug "ghc" nil t)
+;; ;;(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
+;; ;;(add-hook 'haskell-mode-hook 'flymake-hlint-load)
+
+;; ;; when using cabal
+;; ;; (custom-set-variables '(haskell-process-type 'cabal-repl))
+;; ;; when using stack
+;; (custom-set-variables '(haskell-process-type 'stack-ghci))
+;; (setq haskell-process-args-stack-ghci '("--ghci-options=-ferror-spans"))
+
+(package-install 'intero)
+(add-hook 'haskell-mode-hook 'intero-mode)
+
+;; Key binding	Description
+;; M-.	Jump to definition
+;; C-c C-i	Show information of identifier at point
+;; C-c C-t	Show the type of thing at point, or the selection
+;; C-u C-c C-t	Insert a type signature for the thing at point
+;; C-c C-l	Load this module in the REPL
+;; C-c C-r	Apply suggestions from GHC
+;; C-c C-k	Clear REPL
+;; C-c C-z	Switch to and from the REPL
+;; Why does C-c C-l start the session, not the process?
+
+;; Don't use emacs' haskell-session-, instead use haskell-process-:
+
+;; Command	Description
+;; haskell-process-cabal		Prompts for a Cabal command to run
+;; haskell-process-cabal-build		Build the Cabal project
+;; haskell-process-cd		Change directory
+;; haskell-process-restart		Restart the inferior Haskell process
+;; haskell-process-clear		Clear the current process
+;; haskell-process-reload		Reload the current buffer file
+;; haskell-process-load-file		Load the current buffer file
 
 ;;tutch
 (add-to-list 'load-path "~/.emacs.d/site-lisp/")
