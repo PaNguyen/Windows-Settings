@@ -6,7 +6,7 @@
 ;; MELPA installation
 (require 'package)
 (add-to-list 'package-archives
-         '("melpa" . "http://melpa.milkbox.net/packages/") t)
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -53,7 +53,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (intero sml-mode latex-preview-pane ghc flymake-hlint ensime auctex ace-jump-mode))))
+    (omnisharp csharp-mode intero sml-mode latex-preview-pane ghc flymake-hlint ensime auctex ace-jump-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -100,21 +100,21 @@
   (let (
         (currentbuf (get-buffer-window (current-buffer)))
         (newbuf     (generate-new-buffer-name "*shell*"))
-       )
+        )
 
-   (generate-new-buffer newbuf)
-   (set-window-dedicated-p currentbuf nil)
-   (set-window-buffer currentbuf newbuf)
-   (shell newbuf)
-  )
+    (generate-new-buffer newbuf)
+    (set-window-dedicated-p currentbuf nil)
+    (set-window-buffer currentbuf newbuf)
+    (shell newbuf)
+    )
   )
 
 (global-set-key (kbd "C-c s") 'new-shell)
 
 (defun afs ()
-   (interactive)
-   (let ((default-directory "/ssh:phn@unix.andrew.cmu.edu:"))
-     (shell)))
+  (interactive)
+  (let ((default-directory "/ssh:phn@unix.andrew.cmu.edu:"))
+    (shell)))
 
 ;; interpret and use ansi color codes in shell output windows
 (setq ansi-color-names-vector ["dark red" "red" "saddle brown" "yellow" "deep sky blue" "magenta" "cyan" "tan"])
@@ -201,14 +201,14 @@
 
 ;; stop getting process killed confirmations, just kill them
 (setq kill-buffer-query-functions
-  (remq 'process-kill-buffer-query-function
-        kill-buffer-query-functions))
+      (remq 'process-kill-buffer-query-function
+            kill-buffer-query-functions))
 
 ;; kill whole line with M-k
 (global-set-key "\M-k" 'kill-whole-line)
 
 ;; start server for emacsclient
-;; (server-start)
+(server-start)
 
 ;; backup files in temp directory
 (setq backup-directory-alist
@@ -225,6 +225,12 @@
                   week))
       (message "%s" file)
       (delete-file file))))
+
+ ;; scroll one line at a time (less "jumpy" than defaults)
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 1))) ;; one line at a time
+(setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+(setq scroll-step 1) ;; keyboard scroll one line at a time
 
 ;; pdf-tools
 ;; has some dependencies: see https://github.com/politza/pdf-tools
@@ -399,3 +405,22 @@
 
 ;;(load "~/.emacs.d/tuareg/tuareg-site-file")
 ;;(setq tuareg-indent-align-with-first-arg nil)
+
+;;C#
+;; (add-hook 'csharp-mode-hook 'omnisharp-mode)
+;; (eval-after-load
+;;     'company
+;;   '(add-to-list 'company-backends 'company-omnisharp))
+
+;;configuration
+(defun my-csharp-mode-setup ()
+  (setq indent-tabs-mode nil)
+  (setq c-syntactic-indentation t)
+  (c-set-style "ellemtel")
+  (setq c-basic-offset 4)
+  (setq truncate-lines t)
+  (setq tab-width 4)
+  (setq evil-shift-width 4)
+  (local-set-key (kbd "C-c C-c") 'recompile))
+
+(add-hook 'csharp-mode-hook 'my-csharp-mode-setup t)
