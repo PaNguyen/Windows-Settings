@@ -232,6 +232,9 @@
 (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
 (setq scroll-step 1) ;; keyboard scroll one line at a time
 
+;; (global-set-key "C-x C-b" 'switch-to-buffer)
+(define-key global-map (kbd "C-x C-b") 'switch-to-buffer)
+
 ;; pdf-tools
 ;; has some dependencies: see https://github.com/politza/pdf-tools
 ;;(add-to-list 'load-path "~/.emacs.d/tablist")
