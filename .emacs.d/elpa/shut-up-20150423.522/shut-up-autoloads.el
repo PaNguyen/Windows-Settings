@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "shut-up" "shut-up.el" (22939 7408 0 0))
+;;;### (autoloads nil "shut-up" "shut-up.el" (22943 50596 0 0))
 ;;; Generated autoloads from shut-up.el
 
 (autoload 'shut-up "shut-up" "\
