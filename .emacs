@@ -49,6 +49,7 @@
 (setq-default cursor-type 'bar)
 (add-to-list 'default-frame-alist '(cursor-color . "#FFFFFF"))
 
+(add-to-list 'load-path "~/.emacs.d/site-lisp")
 (require 'powerline)
 
 ;; disable start screen
