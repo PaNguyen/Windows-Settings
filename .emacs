@@ -25,7 +25,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -156,6 +156,7 @@
 ;; (global-set-key "C-x C-b" 'switch-to-buffer)
 (define-key global-map (kbd "C-x C-b") 'switch-to-buffer)
 
+(server-start)
 
 
 ;; ;;haskell
@@ -240,11 +241,15 @@
 (defun my-csharp-mode-setup ()
   (setq indent-tabs-mode nil)
   (setq c-syntactic-indentation t)
-  (c-set-style "ellemtel")
   (setq c-basic-offset 4)
   (setq truncate-lines t)
   (setq tab-width 4)
   (setq evil-shift-width 4)
-  (local-set-key (kbd "C-c C-c") 'recompile))
+  (local-set-key (kbd "C-c C-c") 'recompile)
+  (local-set-key (kbd "C-.") 'omnisharp-go-to-definition)
+  (local-set-key (kbd "C-,") 'omnisharp-auto-complete)
+  (local-set-key (kbd "C-c C-r") 'omnisharp-rename)
+  )
 
 (add-hook 'csharp-mode-hook 'my-csharp-mode-setup t)
+(put 'upcase-region 'disabled nil)
