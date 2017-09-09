@@ -25,7 +25,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -158,6 +158,11 @@
 
 (server-start)
 
+;; better buffer switch
+(require 'ido)
+(ido-mode 'buffers) ;; only use this line to turn off ido for file names!
+(setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*"
+               "*Messages*" "Async Shell Command" "*Warnings*" "*Help*"))
 
 ;; ;;haskell
 ;; ;;https://github.com/serras/emacs-haskell-tutorial/blob/master/tutorial.md
@@ -253,3 +258,12 @@
 
 (add-hook 'csharp-mode-hook 'my-csharp-mode-setup t)
 (put 'upcase-region 'disabled nil)
+
+;;nxml
+(defun my-nxml-mode-setup ()
+  (local-set-key (kbd "C-M-n") 'nxml-forward-balanced-item)
+  (local-set-key (kbd "C-M-p") 'nxml-backward-up-element)
+  (local-set-key (kbd "C-M-f") 'nxml-forward-element)
+  (local-set-key (kbd "C-M-b") 'nxml-backward-element)
+  )
+(add-hook 'nxml-mode-hook 'my-nxml-mode-setup t)
