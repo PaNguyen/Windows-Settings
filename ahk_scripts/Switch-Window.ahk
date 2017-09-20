@@ -356,16 +356,14 @@ Loop
     }
 
     if ErrorLevel = EndKey:tab
-        if completion =
-        {
-          if (GetKeyState("LShift", "P")!=1){ ;42td: swapped (without shift = previous)
-                SelectPrevious()
-          }else{
-                SelectNext()
-          }
+    {
+            if (GetKeyState("LShift", "P")!=1){ ;42td: swapped (without shift = previous)
+                    SelectPrevious()
+            }else{
+                    SelectNext()
+            }
             continue
-        }else
-            input = %completion%
+    }
 
     ;;42td: Pass through PrintScreen
     if ErrorLevel = EndKey:PrintScreen
@@ -436,6 +434,7 @@ Loop
 Gosub, CleanExit
 
 return
+
 
 ;----------------------------------------------------------------------
 ;
@@ -673,23 +672,6 @@ RefreshWindowList:
         winarray%i%:=iconTitleArray[i]
     }
 
-    ; if the pattern didn't match any window
-    ; if numwin = 0
-    ;     ; if the search string is empty then we can't do much
-    ;     if search =
-    ;     {
-    ;         Gui, cancel
-    ;         Gosub, CleanExit
-    ;     }
-    ;     ; delete the last character
-    ;     else
-    ;     {
-    ;         if nomatchsound <>
-    ;             SoundPlay, %nomatchsound%
-
-    ;         GoSub, DeleteSearchChar
-    ;         return
-    ;     }
     if (search != "") ;42td: select 2nd group only initially, not after filtering
     {
         LV_Modify(1, "Select") ;;select the first row
@@ -709,82 +691,6 @@ RefreshWindowList:
             Gosub, CleanExit
         }
     GoSub ActivateWindowInBackgroundIfEnabled
-
-    completion =
-
-    if tabcompletion =
-        return
-
-    ; completion is not implemented for first letter match mode
-    if firstlettermatch <>
-        return
-
-    ; determine possible completion if there is
-    ; a search string and there are more than one
-    ; window in the list
-
-    if search =
-        return
-   
-    if numwin = 1
-        return
-    loop
-    {
-        nextchar =
-        loop, %numwin%
-        {
-            stringtrimleft, title, winarray%a_index%, 0
-            if nextchar =
-            {
-                substr = %search%%completion%
-                stringlen, substr_len, substr
-                stringgetpos, pos, title, %substr%
-
-                if pos = -1
-                    break
-
-                pos += %substr_len%
-
-                ; if the substring matches the end of the
-                ; string then no more characters can be completed
-                stringlen, title_len, title
-                if pos >= %title_len%
-                {
-                    pos = -1
-                    break
-                }
-
-                ; stringmid has different position semantics
-                ; than stringgetpos. strange...
-                pos += 1
-                stringmid, nextchar, title, %pos%, 1
-                substr = %substr%%nextchar%
-            }
-            else
-            {
-                stringgetpos, pos, title, %substr%
-                if pos = -1
-                    break
-            }
-        }
-
-        if pos = -1
-            break
-        else
-            completion = %completion%%nextchar%
-    }
-
-    if completion <>
-    {
-        GuiControl,Focus,Edit1 ;; focus Edit1 ,
-        GuiControl,, Edit1, %search%[%completion%]
-        StringLen ,searchStrLen,search
-        ;; Send {Right}
-        Send {Home} ;;
-        Send {Right %searchStrLen%} ;;move right ,
-        ToolTip,You can press <Tab> now `,if you set tabcompletion =yes ,0,-30
-        SetTimer, RemoveToolTip, 3000
-    }
 return
 
 ;----------------------------------------------------------------------
