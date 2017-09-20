@@ -55,24 +55,6 @@
 ; by default.
 ; 
 ;
-; you can use UP,Ctrl+P Alt+p Shift+Tab,Alt+Shift+Tab
-; to select previous item
-; and use Down ,Ctrl+n Alt+n  Tab ,Alt+Tab  to select next item .
-;
-; Ctrl+u will clear all search string in textfield ,
-; Ctrl+h ,and backspace will delete a char.
-; Ctrl+backspace ,AltBackspace will delete last keyword in textfield.
-; enter ,and Ctrl+j for select
-; escape ,and Ctrl+g for cancel
-
-; Ctrl+alt+k ,force kill the selected window
-; Alt+k      ,kill the selected window and quit.
-; Ctrl+k ,    kill the selected window and keep switcher going ,so that
-;             you can select other window or kill other window.
-;
-; Ctrl+s ,  toggle the status of window:minimize,maximize and restore
-; you can press Ctrl+s several times
-;
 ; For the idea of this script the credit goes to the creators of the
 ; iswitchb package for the Emacs editor
 ;
@@ -132,7 +114,7 @@ tabcompletion =yes
 
 ; set this to yes to enable digit shortcuts when there are ten or
 ; less items in the list
-digitshortcuts =yes
+digitshortcuts =
 
 ; set this to yes to enable first letter match mode where the typed
 ; search string must match the first letter of words in the
@@ -159,13 +141,13 @@ activateselectioninbg =
 ; without delay
 ; activateselectioninbg  不为空的时候有效
 
-bgactivationdelay = 600
+bgactivationdelay = 
 
 
 ; Close switcher window if the user activates an other window.
 ; It does not work well if activateselectioninbg is enabled, so
 ; currently they cannot be enabled together.
-closeifinactivated =yes
+closeifinactivated =
 
 if activateselectioninbg <>
     if closeifinactivated <>
@@ -307,7 +289,6 @@ WinGet, switcher_id, ID, A
 OutputDebug % "switcher_id == " . switcher_id
 WinSet, AlwaysOnTop, On, ahk_id %switcher_id%
 
-;Transform, ctrlN, Chr, 
 
 Loop
 {
@@ -316,24 +297,11 @@ Loop
         settimer, CloseIfInactive, 200
 
     ;42td
-    ;patrick: ErrorLevel is an end key if it is one, otherwise "Max"
-    ; HotKey,CapsLock,Off
-    ; Input, input, L1, {enter}{esc}{backspace}{up}{down}{pgup}{pgdn}{tab}{left}{right}{LControl}npsgukjh{LAlt}{LShift}{CapsLock}^{PrintScreen}
     Input, input, L1 M, {enter}{esc}{backspace}{up}{down}{left}{right}{pgup}{pgdn}{tab}{PrintScreen}{LAlt}
-    ;GetKeyState state, ALT
     OutputDebug % "ErrorLevel = " . ErrorLevel
-    ; HotKey,CapsLock,On
 
     if closeifinactivated <>
         settimer, CloseIfInactive, off
-
-	;42td
-	; if ErrorLevel = EndKey:^
-	; {
-	; 	SelectNextInGroup()
-	; 	continue
-        ; }
-
 
     ;;enter for select
     if ErrorLevel = EndKey:Enter
@@ -424,90 +392,11 @@ Loop
             continue
     }
 
-    ;    if (GetKeyState("LAlt", "P")=1 and input = k)
-    if ErrorLevel = EndKey:LAlt
+    if input = %CtrlK%
     {
-            Input, i, L1
-            if i = k
-            {
-                    GoSub, DeleteAllSearchChar
-            }
+            GoSub, DeleteallSearchChar
             continue
     }
-
-
-    ; if ErrorLevel = EndKey:pgup
-    ; {
-    ;     Send, {pgup}
-    ;     GoSuB ActivateWindowInBackgroundIfEnabled
-    ;     continue
-    ; }
-
-    ; if ErrorLevel = EndKey:pgdn
-    ; {
-    ;     Send, {pgdn}
-    ;     GoSuB ActivateWindowInBackgroundIfEnabled
-    ;     continue
-    ; }
-
-    ;;toggle the status of selected window
-    ;;WinMaximize-> WinMinimize->WinRestore-> 
-  ; if ErrorLevel = EndKey:s
-  ;   {
-  ;      if (GetKeyState("LControl", "P")=1){
-  ;         oldCloseifinactivated =closeifinactivated
-  ;         closeifinactivated=
-  ;         settimer, CloseIfInactive, off
-  ;         GoSub, toggleWinStatus
-  ;         WinActivate ,ahk_id %switcher_id%
-  ;         GuiControl,, Edit1,%search%
-  ;         SendInput {end}
-  ;         sleep 10
-  ;         closeifinactivated = oldCloseifinactivated
-  ;         continue
-  ;      }else{
-  ;           input=s
-  ;      }
-
-  ;   }
-
-    ;; TODO modify later to have emacs style
-    ;; SEE ctrl+u
-    ;;Ctrl+alt+k ,force kill the selected window
-    ;;Alt+k      ,kill the selected window and quit.
-    ;;Ctrl+k ,    kill the selected window and keep switcher running ,so that
-    ;;            you can select other window or kill other window.
-  ; if ErrorLevel = EndKey:k
-  ;   {
-  ;      if (GetKeyState("LControl", "P")=1  and GetKeyState("LAlt", "P")=1){
-  ;         GoSub, ForceKillSelectedWindow 
-  ;         GoSub, CancelSwitch       ;; quit 
-  ;         break
-       
-  ;      }else if (GetKeyState("LControl", "P")=1){
-  ;            GoSub, KillSelectedWindow
-  ;            tmpRefresh=yes ;force refresh window list 
-  ;      }else if (GetKeyState("LAlt", "P")=1){
-  ;         GoSub  KillSelectedWindow ;;kill the select window
-  ;         GoSub, CancelSwitch       ;; quit 
-  ;         break
-  ;      }else{
-  ;        input=k
-  ;      }
-
-  ; }
-
-    ; Ctrl+u clear "search" string ,just like bash
-    ; if ErrorLevel = EndKey:u
-    ; {
-    ;   if (GetKeyState("LControl", "P")=1){
-    ;           GoSub, DeleteAllSearchChar
-    ;           continue
-    ;    }else{
-    ;         input=u
-    ;     }
-    ; }
-
 
     ; FIXME: probably other error level cases
     ; should be handled here (interruption?)
@@ -598,6 +487,8 @@ RefreshWindowList:
     ; filter the window list according to the search criteria
     winlist =
     numwin = 0
+
+    ; get windows which match search string
     Loop, %numallwin%
     {
         StringTrimRight, title, allwinarray%a_index%, 0
@@ -605,6 +496,8 @@ RefreshWindowList:
 
         ; don't add the windows not matching the search string
         ; if there is a search string
+
+        ;confirms that this window matches
         if search <>
             if firstlettermatch =
             {
@@ -670,10 +563,6 @@ RefreshWindowList:
 			OutputDebug % "winGroupArray" . numwin . " := allWinGroupArray" . a_index . " == " . winGroupArray%numwin%
 		}
     }    ; window loop
-
-    ; sort the list alphabetically
-    ;;I don't like sort it alphabetically 
-    ;;Sort, winlist, D|
 
 
     ImageListID1 := IL_Create(numwin,1,1)
@@ -785,22 +674,22 @@ RefreshWindowList:
     }
 
     ; if the pattern didn't match any window
-    if numwin = 0
-        ; if the search string is empty then we can't do much
-        if search =
-        {
-            Gui, cancel
-            Gosub, CleanExit
-        }
-        ; delete the last character
-        else
-        {
-            if nomatchsound <>
-                SoundPlay, %nomatchsound%
+    ; if numwin = 0
+    ;     ; if the search string is empty then we can't do much
+    ;     if search =
+    ;     {
+    ;         Gui, cancel
+    ;         Gosub, CleanExit
+    ;     }
+    ;     ; delete the last character
+    ;     else
+    ;     {
+    ;         if nomatchsound <>
+    ;             SoundPlay, %nomatchsound%
 
-            GoSub, DeleteSearchChar
-            return
-        }
+    ;         GoSub, DeleteSearchChar
+    ;         return
+    ;     }
     if (search != "") ;42td: select 2nd group only initially, not after filtering
     {
         LV_Modify(1, "Select") ;;select the first row
@@ -1018,25 +907,6 @@ stringtrimleft, window_id, idarray%rowNum%, 0
 WinActivate, ahk_id %window_id%
 }
 
-;-------------------------------------------
-;Kill the window you selected
-KillSelectedWindow:
-Gui, submit,NoHide 
-rowNum:= LV_GetNext(0)
-stringtrimleft, window_id, idarray%rowNum%, 0
-WinClose, ahk_id %window_id%
-return
-
-;-------------------------------------------
-; force kill the window you selected 
-ForceKillSelectedWindow:
-Gui, submit,NoHide 
-rowNum:= LV_GetNext(0)
-stringtrimleft, window_id, idarray%rowNum%, 0
-WinGet, pid, PId, ahk_id %window_id%
-Process ,Close, %pid%
-send {escape}
-return
 
 ;----------------------------------------------------------------------
 ;
