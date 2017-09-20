@@ -89,6 +89,34 @@ Menu Tray, Icon, %SystemRoot%\system32\shell32.dll, 99
 ;42td avoid taskbar flashing when cycling quickly (function cycleCurrentWindowGroup)
 #WinActivateForce
 
+Transform, CtrlA, Chr, 1
+Transform, CtrlB, Chr, 2
+Transform, CtrlC, Chr, 3
+Transform, CtrlD, Chr, 4
+Transform, CtrlE, Chr, 5
+Transform, CtrlF, Chr, 6
+Transform, CtrlG, Chr, 7
+Transform, CtrlH, Chr, 8
+Transform, CtrlI, Chr, 9
+Transform, CtrlJ, Chr, 10
+Transform, CtrlK, Chr, 11
+Transform, CtrlL, Chr, 12
+Transform, CtrlM, Chr, 13
+Transform, CtrlN, Chr, 14
+Transform, CtrlO, Chr, 15
+Transform, CtrlP, Chr, 16
+Transform, CtrlQ, Chr, 17
+Transform, CtrlR, Chr, 18
+Transform, CtrlS, Chr, 19
+Transform, CtrlT, Chr, 20
+Transform, CtrlU, Chr, 21
+Transform, CtrlV, Chr, 22
+Transform, CtrlW, Chr, 23
+Transform, CtrlX, Chr, 24
+Transform, CtrlY, Chr, 25
+Transform, CtrlZ, Chr, 26
+
+
 Process Priority,,High
 SetBatchLines, -1
 SetKeyDelay  -1
@@ -257,8 +285,7 @@ listSeparator := "`f" ;42td
 ^SC02B:: cycleCurrentWindowGroup(true) ;42td
 
 ;42td: CapsLock as main hotkey
-;!Tab::
-CapsLock::
+!Tab::
 search =
 numallwin = 0
 GuiControl,, Edit1
@@ -280,6 +307,8 @@ WinGet, switcher_id, ID, A
 OutputDebug % "switcher_id == " . switcher_id
 WinSet, AlwaysOnTop, On, ahk_id %switcher_id%
 
+;Transform, ctrlN, Chr, 
+
 Loop
 {
     OutputDebug % "=== input loop ===" ;42td
@@ -287,20 +316,24 @@ Loop
         settimer, CloseIfInactive, 200
 
     ;42td
-    HotKey,CapsLock,Off
-    Input, input, L1, {enter}{esc}{backspace}{up}{down}{pgup}{pgdn}{tab}{left}{right}{LControl}npsgukjh{LAlt}{LShift}{CapsLock}^{PrintScreen}
+    ;patrick: ErrorLevel is an end key if it is one, otherwise "Max"
+    ; HotKey,CapsLock,Off
+    ; Input, input, L1, {enter}{esc}{backspace}{up}{down}{pgup}{pgdn}{tab}{left}{right}{LControl}npsgukjh{LAlt}{LShift}{CapsLock}^{PrintScreen}
+    Input, input, L1 M, {enter}{esc}{backspace}{up}{down}{left}{right}{pgup}{pgdn}{tab}{PrintScreen}{LAlt}
+    ;GetKeyState state, ALT
     OutputDebug % "ErrorLevel = " . ErrorLevel
-    HotKey,CapsLock,On
+    ; HotKey,CapsLock,On
 
     if closeifinactivated <>
         settimer, CloseIfInactive, off
 
 	;42td
-	if ErrorLevel = EndKey:^
-	{
-		SelectNextInGroup()
-		continue
-	}
+	; if ErrorLevel = EndKey:^
+	; {
+	; 	SelectNextInGroup()
+	; 	continue
+        ; }
+
 
     ;;enter for select
     if ErrorLevel = EndKey:Enter
@@ -308,144 +341,25 @@ Loop
         ActivateWindow(0)
         break
     }
-    ;;42td: CapsLock for select
-    if (ErrorLevel == "EndKey:CapsLock") {
-        Send {CapsLock} ;undo toggle
-        ActivateWindow(0)
-        break
-    }
-	;;42td: Pass through PrintScreen
-	if ErrorLevel = EndKey:PrintScreen
-	{
-		Send,{PrintScreen}
-		continue
-	}
-    
-    ;;Ctrl+j for select
-    if ErrorLevel = EndKey:j
-    {
-       if (GetKeyState("LControl", "P")=1){
-           ActivateWindow(0)
-           break
-       }else{
-            input=j
-        }
-    }
-    
+
     ;excape for cancel 
     if ErrorLevel = EndKey:escape
     {
         GoSub, CancelSwitch
         break
     }
-    
-    ;;control+g for cancel too
-    if ErrorLevel = EndKey:g
-    {
-      if (GetKeyState("LControl", "P")=1){
-          GoSub, CancelSwitch
-          break
-       }else{
-            input=g
-        }
-    }
-    
-    if ErrorLevel = EndKey:LAlt
-    {
-       continue
-    }
+
      ;;delete last char 
-    if ErrorLevel = EndKey:backspace
-    {
-       if (GetKeyState("LControl", "P")=1||GetKeyState("LAlt","P")=1){
-          GoSub, DeleteSearchWord
-          continue
-       }else{
-        GoSub, DeleteSearchChar
+     if ErrorLevel = EndKey:backspace
+     {
+             if (GetKeyState("LControl", "P")=1||GetKeyState("LAlt","P")=1){
+                     GoSub, DeleteSearchWord
+                     continue
+             } else{
+                     GoSub, DeleteSearchChar
         continue
        }
-
     }
-    ;;ctrl+ h===backspace
-  if ErrorLevel = EndKey:h
-    {
-       if (GetKeyState("LControl", "P")=1){
-          GoSub, DeleteSearchChar
-          continue
-       }else{
-       input=h
-       }
-
-    }
-    ;;toggle the status of selected window
-    ;;WinMaximize-> WinMinimize->WinRestore-> 
-  if ErrorLevel = EndKey:s
-    {
-       if (GetKeyState("LControl", "P")=1){
-          oldCloseifinactivated =closeifinactivated
-          closeifinactivated=
-          settimer, CloseIfInactive, off
-          GoSub, toggleWinStatus
-          WinActivate ,ahk_id %switcher_id%
-          GuiControl,, Edit1,%search%
-          SendInput {end}
-          sleep 10
-          closeifinactivated = oldCloseifinactivated
-          continue
-       }else{
-            input=s
-       }
-
-    }
-    
-    ;;Ctrl+alt+k ,force kill the selected window
-    ;;Alt+k      ,kill the selected window and quit.
-    ;;Ctrl+k ,    kill the selected window and keep switcher running ,so that
-    ;;            you can select other window or kill other window.
-  if ErrorLevel = EndKey:k
-    {
-       if (GetKeyState("LControl", "P")=1  and GetKeyState("LAlt", "P")=1){
-          GoSub, ForceKillSelectedWindow 
-          GoSub, CancelSwitch       ;; quit 
-          break
-       
-       }else if (GetKeyState("LControl", "P")=1){
-             GoSub, KillSelectedWindow
-             tmpRefresh=yes ;force refresh window list 
-       }else if (GetKeyState("LAlt", "P")=1){
-          GoSub  KillSelectedWindow ;;kill the select window
-          GoSub, CancelSwitch       ;; quit 
-          break
-       }else{
-         input=k
-       }
-
-    }
-    ;;Ctrl+u clear "search" string ,just like bash
-    if ErrorLevel = EndKey:u
-    {
-      if (GetKeyState("LControl", "P")=1){
-              GoSub, DeleteAllSearchChar
-              continue
-       }else{
-            input=u
-        }
-    }
-    
-        
-    if ErrorLevel = EndKey:tab
-        if completion =
-        {
-          if (GetKeyState("LShift", "P")!=1){ ;42td: swapped (without shift = previous)
-                SelectPrevious()
-          }else{
-                SelectNext()
-          }
-            continue
-        }else
-            input = %completion%
-
-    ; pass these keys to the selector window
 
     if ErrorLevel = EndKey:up
     {
@@ -457,46 +371,6 @@ Loop
     {
        SelectNext()
        continue
-    }
-    if ErrorLevel = EndKey:LControl
-       {
-          continue
-       }
-
-     ;;ctrl+n ,or Alt+n select next item
-    if ErrorLevel = EndKey:n
-      {
-       if (GetKeyState("LControl", "P")=1||GetKeyState("LAlt", "P")=1){
-           SelectNext()
-           continue
-       }else{
-            input=n
-        }
-     }
-     ;;ctrl+p ,Alt+p select previous item
-      if ErrorLevel = EndKey:p
-      {
-       if (GetKeyState("LControl", "P")=1||GetKeyState("LAlt", "P")=1){
-           SelectPrevious()
-           continue
-        }else{
-            input=p
-        }
- 
-    }
-  
-    if ErrorLevel = EndKey:pgup
-    {
-        Send, {pgup}
-        GoSuB ActivateWindowInBackgroundIfEnabled
-        continue
-    }
-
-    if ErrorLevel = EndKey:pgdn
-    {
-        Send, {pgdn}
-        GoSuB ActivateWindowInBackgroundIfEnabled
-        continue
     }
 
     if ErrorLevel = EndKey:left
@@ -513,12 +387,127 @@ Loop
         continue
     }
 
-    ;42td
-    if (GetKeyState("LShift", "P")=1)
+    if ErrorLevel = EndKey:tab
+        if completion =
+        {
+          if (GetKeyState("LShift", "P")!=1){ ;42td: swapped (without shift = previous)
+                SelectPrevious()
+          }else{
+                SelectNext()
+          }
+            continue
+        }else
+            input = %completion%
+
+    ;;42td: Pass through PrintScreen
+    if ErrorLevel = EndKey:PrintScreen
     {
-       SelectNext()
-       continue
+            Send,{PrintScreen}
+            continue
     }
+
+    ;;control+g for cancel too
+    if input = %CtrlG%
+    {
+            GoSub, CancelSwitch
+            break
+    }
+
+    if input = %CtrlN%
+    {
+            SelectNext()
+            continue
+    }
+    if input = %CtrlP%
+    {
+            SelectPrevious()
+            continue
+    }
+
+    ;    if (GetKeyState("LAlt", "P")=1 and input = k)
+    if ErrorLevel = EndKey:LAlt
+    {
+            Input, i, L1
+            if i = k
+            {
+                    GoSub, DeleteAllSearchChar
+            }
+            continue
+    }
+
+
+    ; if ErrorLevel = EndKey:pgup
+    ; {
+    ;     Send, {pgup}
+    ;     GoSuB ActivateWindowInBackgroundIfEnabled
+    ;     continue
+    ; }
+
+    ; if ErrorLevel = EndKey:pgdn
+    ; {
+    ;     Send, {pgdn}
+    ;     GoSuB ActivateWindowInBackgroundIfEnabled
+    ;     continue
+    ; }
+
+    ;;toggle the status of selected window
+    ;;WinMaximize-> WinMinimize->WinRestore-> 
+  ; if ErrorLevel = EndKey:s
+  ;   {
+  ;      if (GetKeyState("LControl", "P")=1){
+  ;         oldCloseifinactivated =closeifinactivated
+  ;         closeifinactivated=
+  ;         settimer, CloseIfInactive, off
+  ;         GoSub, toggleWinStatus
+  ;         WinActivate ,ahk_id %switcher_id%
+  ;         GuiControl,, Edit1,%search%
+  ;         SendInput {end}
+  ;         sleep 10
+  ;         closeifinactivated = oldCloseifinactivated
+  ;         continue
+  ;      }else{
+  ;           input=s
+  ;      }
+
+  ;   }
+
+    ;; TODO modify later to have emacs style
+    ;; SEE ctrl+u
+    ;;Ctrl+alt+k ,force kill the selected window
+    ;;Alt+k      ,kill the selected window and quit.
+    ;;Ctrl+k ,    kill the selected window and keep switcher running ,so that
+    ;;            you can select other window or kill other window.
+  ; if ErrorLevel = EndKey:k
+  ;   {
+  ;      if (GetKeyState("LControl", "P")=1  and GetKeyState("LAlt", "P")=1){
+  ;         GoSub, ForceKillSelectedWindow 
+  ;         GoSub, CancelSwitch       ;; quit 
+  ;         break
+       
+  ;      }else if (GetKeyState("LControl", "P")=1){
+  ;            GoSub, KillSelectedWindow
+  ;            tmpRefresh=yes ;force refresh window list 
+  ;      }else if (GetKeyState("LAlt", "P")=1){
+  ;         GoSub  KillSelectedWindow ;;kill the select window
+  ;         GoSub, CancelSwitch       ;; quit 
+  ;         break
+  ;      }else{
+  ;        input=k
+  ;      }
+
+  ; }
+
+    ; Ctrl+u clear "search" string ,just like bash
+    ; if ErrorLevel = EndKey:u
+    ; {
+    ;   if (GetKeyState("LControl", "P")=1){
+    ;           GoSub, DeleteAllSearchChar
+    ;           continue
+    ;    }else{
+    ;         input=u
+    ;     }
+    ; }
+
 
     ; FIXME: probably other error level cases
     ; should be handled here (interruption?)
