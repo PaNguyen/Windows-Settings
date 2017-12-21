@@ -83,7 +83,7 @@
 ;----------------------------------------------------------------------
 ;
 #SingleInstance force
-#NoTrayIcon
+; #NoTrayIcon
 #InstallKeybdHook
 
 Transform, CtrlA, Chr, 1
@@ -162,11 +162,13 @@ bgactivationdelay = 600
 closeifinactivated =yes
 
 if activateselectioninbg <>
-    if closeifinactivated <>
-    {
-        msgbox, activateselectioninbg and closeifinactivated cannot be enabled together
-        exitapp
-    }
+{
+        if closeifinactivated <>
+        {
+                msgbox, activateselectioninbg and closeifinactivated cannot be enabled together
+                exitapp
+        }
+}
 
 ; List of subtsrings separated with pipe (|) characters (e.g. carpe|diem).
 ; Window titles containing any of the listed substrings are filtered out
@@ -186,8 +188,12 @@ dynamicwindowlist =
 nomatchsound = %windir%\Media\ding.wav
 
 if nomatchsound <>
-    ifnotexist, %nomatchsound%
-        msgbox, Sound file %nomatchsound% not found. No sound will be played.
+{
+        ifnotexist, %nomatchsound%
+        {
+                msgbox, Sound file %nomatchsound% not found. No sound will be played.
+        }
+}
 
 ;----------------------------------------------------------------------
 ;
@@ -238,6 +244,7 @@ if filterlist <>
 !Tab::
 search =
 numallwin = 0
+loopiter = 0
 GuiControl,, Edit1
 GoSub, RefreshWindowList
 
@@ -255,276 +262,111 @@ Gui, Show, Center h550 w800, Window Switcher
 WinGet, switcher_id, ID, A
 WinSet, AlwaysOnTop, On, ahk_id %switcher_id%
 
+; SetTimer, RefreshWindowList, 100
+
 Loop
 {
-    if closeifinactivated <>
-        settimer, CloseIfInactive, 200
+        loopiter = %loopiter%+1
+                OutputDebug, here %loopiter%
+        ;OutputDebug, search1=%search%
 
-; Input, input, L1, {enter}{esc}{backspace}{up}{down}{pgup}{pgdn}{tab}{left}{right}{LControl}npsgukjh{LAlt}
-Input, input, L1 M, {enter}{esc}{backspace}{tab}{up}{down}
+        if closeifinactivated <>
+        {
+                settimer, CloseIfInactive, 200
+        }
 
-    if closeifinactivated <>
-        settimer, CloseIfInactive, off
+        ; Input, input, L1, {enter}{esc}{backspace}{up}{down}{pgup}{pgdn}{tab}{left}{right}{LControl}npsgukjh{LAlt}
+        Input, input, L1 M, {enter}{esc}{backspace}{tab}{up}{down}
 
-    ;;enter for select
-    if ErrorLevel = EndKey:enter
-    {
-        GoSub, ActivateWindow
-        break
-    }
-    
-    ; ;;Ctrl+j for select
-    ; if ErrorLevel = EndKey:j
-    ; {
-    ;    if (GetKeyState("LControl", "P")=1){
-    ;        GoSub, ActivateWindow
-    ;        break
-    ;    }else{
-    ;         input=j
-    ;     }
-    ; }
-    
-    ;excape for cancel 
-    if ErrorLevel = EndKey:escape
-    {
-        GoSub, CancelSwitch
-        break
-    }
-    
-    ; ;;control+g for cancel too
-    ; if ErrorLevel = EndKey:g
-    ; {
-    ;   if (GetKeyState("LControl", "P")=1){
-    ;       GoSub, CancelSwitch
-    ;       break
-    ;    }else{
-    ;         input=g
-    ;     }
-    ; }
-    if input = %CtrlG%
-    {
-            GoSub, CancelSwitch
-            break
-    }
+        if closeifinactivated <>
+        {
+                settimer, CloseIfInactive, off
+        }
 
-    
-    ; if ErrorLevel = EndKey:LAlt
-    ; {
-    ;    continue
-    ; }
-
-     ;;delete last char 
-    if ErrorLevel = EndKey:backspace
-    {
-       if (GetKeyState("LControl", "P")=1||GetKeyState("LAlt","P")=1){
-          GoSub, DeleteSearchWord
-          continue
-       }else{
-        GoSub, DeleteSearchChar
-        continue
-       }
-
-    }
-
-    ;;ctrl+ h===backspace
-  ; if ErrorLevel = EndKey:h
-  ;   {
-  ;      if (GetKeyState("LControl", "P")=1){
-  ;         GoSub, DeleteSearchChar
-  ;         continue
-  ;      }else{
-  ;      input=h
-  ;      }
-
-  ;   }
-
-    ;;toggle the status of selected window
-    ;;WinMaximize-> WinMinimize->WinRestore-> 
-  ; if ErrorLevel = EndKey:s
-  ;   {
-  ;      if (GetKeyState("LControl", "P")=1){
-  ;         oldCloseifinactivated =closeifinactivated
-  ;         closeifinactivated=
-  ;         settimer, CloseIfInactive, off
-  ;         GoSub, toggleWinStatus
-  ;         WinActivate ,ahk_id %switcher_id%
-  ;         GuiControl,, Edit1,%search%
-  ;         SendInput {end}
-  ;         sleep 10
-  ;         closeifinactivated = oldCloseifinactivated
-  ;         continue
-  ;      }else{
-  ;           input=s
-  ;      }
-
-  ;   }
-    
-    ;;Ctrl+alt+k ,force kill the selected window
-    ;;Alt+k      ,kill the selected window and quit.
-    ;;Ctrl+k ,    kill the selected window and keep switcher running ,so that
-    ;;            you can select other window or kill other window.
-  ; if ErrorLevel = EndKey:k
-  ;   {
-  ;      if (GetKeyState("LControl", "P")=1  and GetKeyState("LAlt", "P")=1){
-  ;         GoSub, ForceKillSelectedWindow 
-  ;         GoSub, CancelSwitch       ;; quit 
-  ;         break
-       
-  ;      }else if (GetKeyState("LControl", "P")=1){
-  ;            GoSub, KillSelectedWindow
-  ;            tmpRefresh=yes ;force refresh window list 
-  ;      }else if (GetKeyState("LAlt", "P")=1){
-  ;         GoSub  KillSelectedWindow ;;kill the select window
-  ;         GoSub, CancelSwitch       ;; quit 
-  ;         break
-  ;      }else{
-  ;        input=k
-  ;      }
-
-  ;   }
-
-    ;;Ctrl+u clear "search" string ,just like bash
-    ; if ErrorLevel = EndKey:u
-    ; {
-    ;   if (GetKeyState("LControl", "P")=1){
-    ;           GoSub, DeleteAllSearchChar
-    ;           continue
-    ;    }else{
-    ;         input=u
-    ;     }
-    ; }
-    
-        
-    if ErrorLevel = EndKey:tab
-    {
-        ; if completion =
-        ; {
-        ;   if (GetKeyState("LShift", "P")=1){
-        ;         GoSuB SelectPrevious
-        ;   }else{
-        ;         GoSuB SelectNext
-        ;   }
-        ;     continue
-        ; }else
-        ;     input = %completion%
-
-        GoSub, ActivateWindow
-        break
-    }
+        ;;enter for select
+        if ErrorLevel = EndKey:enter
+        {
+                GoSub, ActivateWindow
+                break
+        }
 
 
-    ; pass these keys to the selector window
+        ;excape for cancel 
+        if ErrorLevel = EndKey:escape
+        {
+                GoSub, CancelSwitch
+                break
+        }
 
-    if ErrorLevel = EndKey:up
-    {
-        GoSuB SelectPrevious
-        continue
-    }
+        ; ;;control+g for cancel too
+        if input = %CtrlG%
+        {
+                GoSub, CancelSwitch
+                break
+        }
 
-    if ErrorLevel = EndKey:down
-    {
-       GoSuB SelectNext
-       continue
-    }
-    if ErrorLevel = EndKey:LControl
-       {
-          continue
-       }
+        ;;delete last char 
+        if ErrorLevel = EndKey:backspace
+        {
+                if (GetKeyState("LControl", "P")=1||GetKeyState("LAlt","P")=1)
+                {
+                        GoSub, DeleteSearchWord
+                        continue
+                }else
+                {
+                        GoSub, DeleteSearchChar
+                        continue
+                }
 
-     ;;ctrl+n ,or Alt+n select next item
-    ; if ErrorLevel = EndKey:n
-    ;   {
-    ;    if (GetKeyState("LControl", "P")=1||GetKeyState("LAlt", "P")=1){
-    ;        GoSuB SelectNext
-    ;        continue
-    ;    }else{
-    ;         input=n
-    ;     }
-    ;  }
-    if input = %CtrlN%
-    {
-            GoSub SelectNext
-            continue
-    }
+        }
 
-     ;;ctrl+p ,Alt+p select previous item
-    ;   if ErrorLevel = EndKey:p
-    ;   {
-    ;    if (GetKeyState("LControl", "P")=1||GetKeyState("LAlt", "P")=1){
-    ;        GoSuB SelectPrevious
-    ;        continue
-    ;     }else{
-    ;         input=p
-    ;     }
- 
-    ; }
+        if ErrorLevel = EndKey:tab
+        {
+                GoSub, ActivateWindow
+                break
+        }
 
-    if input = %CtrlP%
-    {
-            GoSub SelectPrevious
-            continue
-    }
+
+        ; pass these keys to the selector window
+
+        if ErrorLevel = EndKey:up
+        {
+                GoSuB SelectPrevious
+                continue
+        }
+
+        if ErrorLevel = EndKey:down
+        {
+                GoSuB SelectNext
+                continue
+        }
+        if ErrorLevel = EndKey:LControl
+        {
+                continue
+        }
+
+        if input = %CtrlN%
+        {
+                GoSub SelectNext
+                continue
+        }
+
+        if input = %CtrlP%
+        {
+                GoSub SelectPrevious
+                continue
+        }
   
-    ; if ErrorLevel = EndKey:pgup
-    ; {
-    ;     Send, {pgup}
-    ;     GoSuB ActivateWindowInBackgroundIfEnabled
-    ;     continue
-    ; }
 
-    ; if ErrorLevel = EndKey:pgdn
-    ; {
-    ;     Send, {pgdn}
-    ;     GoSuB ActivateWindowInBackgroundIfEnabled
-    ;     continue
-    ; }
+        ; process typed character
 
-    ; if ErrorLevel = EndKey:left
-    ; {
-    ;     direction = -1
-    ;     GoSuB MoveSwitcher
-    ;     continue
-    ; }
-
-    ; if ErrorLevel = EndKey:right
-    ; {
-    ;     direction = 1
-    ;     GoSuB MoveSwitcher
-    ;     continue
-    ; }
-
-    ; FIXME: probably other error level cases
-    ; should be handled here (interruption?)
-
-    ; invoke digit shortcuts if applicable
-;     if digitshortcuts <>
-;         if numwin <= 10
-;             if input in 1,2,3,4,5,6,7,8,9,0
-;             {
-;                 if input = 0
-;                     input = 10
-
-;                 if numwin < %input%
-;                 {
-;                     if nomatchsound <>
-;                         SoundPlay, %nomatchsound%
-;                     continue
-;                 }
-
-;                  LV_Modify(input, "Select") ;;select last line
-;                  LV_Modify(input, "Focus") ;; focus last line
-; ;;                GuiControl, choose, ListView1, %input%
-;                 GoSub, ActivateWindow
-;                 break
-;             }
-
-    ; process typed character
-
-    search = %search%%input%
-    GuiControl,, Edit1, %search%
-    GuiControl,Focus,Edit1 ;; focus Edit1 ,
-    Send {End} ;;move cursor right ,make it after the new inputed char 
-    GoSub, RefreshWindowList
+        search = %search%%input%
+        ;OutputDebug, search=%search%
+        GuiControl,, Edit1, %search%
+        GuiControl,Focus,Edit1 ;; focus Edit1 ,
+        Send {End} ;;move cursor right ,make it after the new inputed char 
+        GoSub, RefreshWindowList
+        OutputDebug, there
 }
 
 Gosub, CleanExit
@@ -539,7 +381,8 @@ return
 ;       idarray - see the documentation of global variables
 ;
 RefreshWindowList:
-    ; refresh the list of windows if necessary
+        ; refresh the list of windows if necessary
+searchLocal := search
 
     if ( dynamicwindowlist = "yes" or numallwin = 0 or tmpRefresh="yes" )
     {
@@ -550,35 +393,38 @@ RefreshWindowList:
 
         Loop, %id%
         {
-            StringTrimRight, this_id, id%a_index%, 0
-            WinGetTitle, title, ahk_id %this_id%
+                StringTrimRight, this_id, id%a_index%, 0
+                WinGetTitle, title, ahk_id %this_id%
 
-            ; FIXME: windows with empty titles?
-            if title =
-                continue
+                ; FIXME: windows with empty titles?
+                if title =
+                        continue
 
-            ; don't add the switcher window
-            if switcher_id = %this_id%
-                continue
+                ; don't add the switcher window
+                if switcher_id = %this_id%
+                        continue
 
 
             ; don't add titles which match any of the filters
             if filterlist <>
             {
-                filtered =
-
-                loop
-                {
-                    stringtrimright, filter, filters%a_index%, 0
-                    if filter =
-                      break
-                    else
-                        ifinstring, title, %filter%
-                        {
-                           filtered = yes
-                           break
-                        }
-                }
+                    filtered =
+                    loop
+                    {
+                            stringtrimright, filter, filters%a_index%, 0
+                            if filter =
+                            {
+                                    break
+                            }
+                            else
+                            {
+                                    ifinstring, title, %filter%
+                                    {
+                                            filtered = yes
+                                            break
+                                    }
+                            }
+                    }
 
                 if filtered = yes
                     continue
@@ -604,49 +450,56 @@ RefreshWindowList:
 
         ; don't add the windows not matching the search string
         ; if there is a search string
-        if search <>
-            if firstlettermatch =
-            {
-                matched=yes
-                procName:=getProcessname(this_id)
-                
-                titleAndProcName=%title%%procName%
-                Loop,parse,search ,%A_Space%,%A_Space%%A_TAB%
+        if searchLocal <>
+        {
+                if firstlettermatch =
                 {
-                    if titleAndProcName not contains %A_LoopField%,
-                    { matched=no
-                      break
-                    }
+                        matched=yes
+                        procName:=getProcessname(this_id)
+
+                        titleAndProcName=%title%%procName%
+                        ;OutputDebug, search2=%search%
+                        Loop,parse,searchLocal ,%A_Space%,%A_Space%%A_TAB%
+                        {
+                                ;OutputDebug, search3=%search%
+                                if titleAndProcName not contains %A_LoopField%,
+                                {
+                                        matched=no
+                                        break
+                                }
+                        }
+                        if matched=no
+                        {
+                                continue
+                        }
                 }
-              if matched=no
-               {
-                  continue
-               }
-            }
-            else
-            {
-                stringlen, search_len, search
+                else
+                {
+                        stringlen, search_len, searchLocal
+                        ;OutputDebug, search4=%search%
 
-                index = 1
-                match =
+                        index = 1
+                        match =
 
-                loop, parse, title, %A_Space%
-                {                   
-                    stringleft, first_letter, A_LoopField, 1
+                        loop, parse, title, %A_Space%
+                        {                   
+                        stringleft, first_letter, A_LoopField, 1
 
-                    ; only words beginning with an alphanumeric
-                    ; character are taken into account
-                    if first_letter not in 1,2,3,4,5,6,7,8,9,0,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z
-                        continue
+                        ; only words beginning with an alphanumeric
+                        ; character are taken into account
+                        if first_letter not in 1,2,3,4,5,6,7,8,9,0,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z
+                                continue
 
-                    stringmid, search_char, search, %index%, 1
+                        stringmid, search_char, searchLocal, %index%, 1
+                        ;OutputDebug, search5=%search%
 
-                    if first_letter <> %search_char%
-                        break
 
-                    index += 1
+                        if first_letter <> %search_char%
+                                break
 
-                    ; no more search characters
+                        index += 1
+
+                        ; no more search characters
                     if index > %search_len%
                     {
                         match = yes
@@ -657,6 +510,7 @@ RefreshWindowList:
                 if match =
                     continue    ; no match
             }
+        }
         numwin += 1
         winarray%numwin% = %title%
         idarray%numwin%= %this_id%
@@ -666,7 +520,7 @@ RefreshWindowList:
     ;;Sort, winlist, D|
 
 
-ImageListID1 := IL_Create(numwin,1,1)
+    ImageListID1 := IL_Create(numwin,1,1)
 ; Attach the ImageLists to the ListView so that it can later display the icons:
 LV_SetImageList(ImageListID1, 1)
 LV_Delete()
@@ -740,23 +594,7 @@ for i ,ele in iconIdArray{
    idarray%i%:=ele
    winarray%i%:=iconTitleArray[i]
 }
-    ; ; if the pattern didn't match any window
-    ; if numwin = 0
-    ;     ; if the search string is empty then we can't do much
-    ;     if search =
-    ;     {
-    ;         Gui, cancel
-    ;         Gosub, CleanExit
-    ;     }
-    ;     ; delete the last character
-    ;     else
-    ;     {
-    ;         if nomatchsound <>
-    ;             SoundPlay, %nomatchsound%
 
-    ;         GoSub, DeleteSearchChar
-    ;         return
-    ;     }
  if numwin >1
  {
     LV_Modify(2, "Select") ;;select the first row
@@ -776,82 +614,6 @@ for i ,ele in iconIdArray{
             Gosub, CleanExit
         }
     GoSub ActivateWindowInBackgroundIfEnabled
-
-    completion =
-
-    if tabcompletion =
-        return
-
-    ; completion is not implemented for first letter match mode
-    if firstlettermatch <>
-        return
-
-    ; determine possible completion if there is
-    ; a search string and there are more than one
-    ; window in the list
-
-    if search =
-        return
-   
-    if numwin = 1
-        return
-     loop
-    {
-        nextchar =
-        loop, %numwin%
-        {
-            stringtrimleft, title, winarray%a_index%, 0
-            if nextchar =
-            {
-                substr = %search%%completion%
-                stringlen, substr_len, substr
-                stringgetpos, pos, title, %substr%
-
-                if pos = -1
-                    break
-
-                pos += %substr_len%
-
-                ; if the substring matches the end of the
-                ; string then no more characters can be completed
-                stringlen, title_len, title
-                if pos >= %title_len%
-                {
-                    pos = -1
-                    break
-                }
-
-                ; stringmid has different position semantics
-                ; than stringgetpos. strange...
-                pos += 1
-                stringmid, nextchar, title, %pos%, 1
-                substr = %substr%%nextchar%
-             }
-             else
-             {
-                stringgetpos, pos, title, %substr%
-                if pos = -1
-                    break
-             }
-        }
-
-        if pos = -1
-            break
-        else
-            completion = %completion%%nextchar%
-    }
-
-    if completion <>
-    {
-        GuiControl,Focus,Edit1 ;; focus Edit1 ,
-        GuiControl,, Edit1, %search%[%completion%]
-         StringLen ,searchStrLen,search
-        ;; Send {Right}
-         Send {Home} ;;
-         Send {Right %searchStrLen%} ;;move right ,
-         ToolTip,You can press <Tab> now `,if you set tabcompletion =yes ,0,-30
-         SetTimer, RemoveToolTip, 3000
-    }
 return
 
 ;----------------------------------------------------------------------
@@ -864,7 +626,9 @@ if search =
     GuiControl,, Edit1, 
     return
 }
+;OutputDebug, search9=%search%
 StringTrimRight, search, search, 1
+;OutputDebug, search8=%search%
 GuiControl,, Edit1, %search%
 GuiControl,Focus,Edit1 ;; focus Edit1 ,
 Send {End} ;;move cursor end 
@@ -994,7 +758,8 @@ return
 ;
 CleanExit:
 
-settimer, BgActivationTimer, off
+        settimer, BgActivationTimer, off
+        settimer, RefreshWindowList, off
 
 exit
 
