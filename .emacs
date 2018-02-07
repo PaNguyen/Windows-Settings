@@ -25,7 +25,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -34,7 +34,10 @@
  )
 
 ;; show line numbers
-(global-linum-mode t)
+;; (global-linum-mode t)
+;; only when less than 5000 lines
+(add-hook 'prog-mode-hook
+(lambda () (linum-mode (- (* 5000 80) (buffer-size)))))
 
 (setq tramp-default-method "ssh")
 
@@ -59,6 +62,8 @@
 (setq inhibit-startup-echo-area-message t)
 
 (setq initial-scratch-message "")
+(setq initial-major-mode 'text-mode)
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
 
 ;; An easy command for opening new shells:
 (defun new-shell ()
@@ -274,7 +279,7 @@
 ;; (setq haskell-process-args-stack-ghci '("--ghci-options=-ferror-spans"))
 
 (package-install 'intero)
-(add-hook 'haskell-mode-hook 'intero-mode)
+;; (add-hook 'haskell-mode-hook 'intero-mode)
 
 ;; Key binding	Description
 ;; M-.	Jump to definition
@@ -301,10 +306,10 @@
 
 
 ;;C#
-(add-hook 'csharp-mode-hook 'omnisharp-mode)
-(eval-after-load
-    'company
-  '(add-to-list 'company-backends 'company-omnisharp))
+;; (add-hook 'csharp-mode-hook 'omnisharp-mode)
+;; (eval-after-load
+;;     'company
+;;   '(add-to-list 'company-backends 'company-omnisharp))
 
 ;;configuration
 (defun my-csharp-mode-setup ()
@@ -320,7 +325,7 @@
   (local-set-key (kbd "C-c C-r") 'omnisharp-rename)
   )
 
-(add-hook 'csharp-mode-hook 'my-csharp-mode-setup t)
+;; (add-hook 'csharp-mode-hook 'my-csharp-mode-setup t)
 (put 'upcase-region 'disabled nil)
 
 ;;nxml

@@ -1,0 +1,9 @@
+explorer .
+doskey here=explorer .
+here
+here
+doskey /?
+doskey /macros
+dir
+ls
+ls
