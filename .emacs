@@ -65,6 +65,25 @@
 (setq initial-major-mode 'text-mode)
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
+;; Open new empty buffer without prompting for name
+(defun xah-new-empty-buffer ()
+  "Create a new empty buffer.
+New buffer will be named 'scratch' or 'scratch<2>', 'scratch<3>', etc.
+
+It returns the buffer (for elisp programing).
+
+URL `http://ergoemacs.org/emacs/emacs_new_empty_buffer.html'
+Version 2017-11-01"
+  (interactive)
+  (let (($buf (generate-new-buffer "scratch")))
+    (switch-to-buffer $buf)
+    (funcall initial-major-mode)
+    (setq buffer-offer-save t)
+    $buf
+    ))
+(global-set-key (kbd "C-c b") 'xah-new-empty-buffer)
+(global-set-key (kbd "C-c C-b") 'xah-new-empty-buffer)
+
 ;; An easy command for opening new shells:
 (defun new-shell ()
   (interactive)
@@ -93,7 +112,10 @@
     (delete-region (point-min) (point-max))
     (comint-simple-send (get-buffer-process (current-buffer)) 
                         (concat "export PS1=\"\033[33m" buffer "\033[0m:\033[35m\\W\033[0m>\""))))
-(global-set-key (kbd "C-c C-u s") 'anr-shell) 
+(global-set-key (kbd "C-c C-u s") 'anr-shell)
+
+;;Inserting text while mark active will delete selected text
+(delete-selection-mode 1)
 
 ;; interpret and use ansi color codes in shell output windows
 (setq ansi-color-names-vector ["dark red" "red" "saddle brown" "yellow" "deep sky blue" "magenta" "cyan" "tan"])
