@@ -25,7 +25,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -192,21 +192,38 @@ Version 2017-11-01"
 ;; better buffer switch
 (require 'ido)
 (ido-mode t)
+(ido-everywhere 1)
+
+(require 'ido-completing-read+)
+(ido-ubiquitous-mode 1)
+
+(require 'smex)
+(smex-initialize) ; Can be omitted. This might cause a (minimal) delay
+                  ; when Smex is auto-initialized on its first run.
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+;; This is your old M-x.
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+
+;;For any case where ido cannot be used, there is another older mode called icomplete-mode that integrates with standard emacs completion and adds some ido-like behavior.
+(require 'icomplete)
+(icomplete-mode 1)
+
 ;; (ido-mode 'buffers) ;; only use this line to turn off ido for file names!
 (setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*"
                            "*Messages*" "Async Shell Command" "*Warnings*" "*Help*"))
 (require 'ido-better-flex)
 (ido-better-flex/enable)
 
-(global-set-key
- "\M-x"
- (lambda ()
-   (interactive)
-   (call-interactively
-    (intern
-     (ido-completing-read
-      "M-x "
-      (all-completions "" obarray 'commandp))))))
+;; (global-set-key
+;;  "\M-x"
+;;  (lambda ()
+;;    (interactive)
+;;    (call-interactively
+;;     (intern
+;;      (ido-completing-read
+;;       "M-x "
+;;       (all-completions "" obarray 'commandp))))))
 
 ;; Display ido results vertically, rather than horizontally
 (setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
@@ -217,34 +234,34 @@ Version 2017-11-01"
     (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
 (add-hook 'ido-setup-hook 'ido-define-keys)
 
-;;make ido complete almost anything (except the stuff where it shouldn'
-(defvar ido-enable-replace-completing-read t
-  "If t, use ido-completing-read instead of completing-read if possible.
+;; ;;make ido complete almost anything (except the stuff where it shouldn'
+;; (defvar ido-enable-replace-completing-read t
+;;   "If t, use ido-completing-read instead of completing-read if possible.
     
-    Set it to nil using let in around-advice for functions where the
-    original completing-read is required.  For example, if a function
-    foo absolutely must use the original completing-read, define some
-    advice like this:
+;;     Set it to nil using let in around-advice for functions where the
+;;     original completing-read is required.  For example, if a function
+;;     foo absolutely must use the original completing-read, define some
+;;     advice like this:
     
-    (defadvice foo (around original-completing-read-only activate)
-      (let (ido-enable-replace-completing-read) ad-do-it))")
-;; Replace completing-read wherever possible, unless directed otherwise
-(defadvice completing-read
-    (around use-ido-when-possible activate)
-  (if (or (not ido-enable-replace-completing-read) ; Manual override disable ido
-          (and (boundp 'ido-cur-list)
-               ido-cur-list)) ; Avoid infinite loop from ido calling this
-      ad-do-it
-    (let ((allcomp (all-completions "" collection predicate)))
-      (if allcomp
-          (setq ad-return-value
-                (ido-completing-read prompt
-                                     allcomp
-                                     nil require-match initial-input hist def))
-        ad-do-it))))
-(add-hook 'dired-mode-hook
-          '(lambda ()
-             (set (make-local-variable 'ido-enable-replace-completing-read) nil)))
+;;     (defadvice foo (around original-completing-read-only activate)
+;;       (let (ido-enable-replace-completing-read) ad-do-it))")
+;; ;; Replace completing-read wherever possible, unless directed otherwise
+;; (defadvice completing-read
+;;     (around use-ido-when-possible activate)
+;;   (if (or (not ido-enable-replace-completing-read) ; Manual override disable ido
+;;           (and (boundp 'ido-cur-list)
+;;                ido-cur-list)) ; Avoid infinite loop from ido calling this
+;;       ad-do-it
+;;     (let ((allcomp (all-completions "" collection predicate)))
+;;       (if allcomp
+;;           (setq ad-return-value
+;;                 (ido-completing-read prompt
+;;                                      allcomp
+;;                                      nil require-match initial-input hist def))
+;;         ad-do-it))))
+;; (add-hook 'dired-mode-hook
+;;           '(lambda ()
+;;              (set (make-local-variable 'ido-enable-replace-completing-read) nil)))
 
 ;;END IDO
 
