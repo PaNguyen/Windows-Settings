@@ -25,7 +25,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -226,13 +226,14 @@ Version 2017-11-01"
 ;;       (all-completions "" obarray 'commandp))))))
 
 ;; Display ido results vertically, rather than horizontally
-(setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
-(defun ido-disable-line-truncation () (set (make-local-variable 'truncate-lines) nil))
-  (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
-  (defun ido-define-keys () ;; C-n/p is more intuitive in vertical layout
-    (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
-    (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
-(add-hook 'ido-setup-hook 'ido-define-keys)
+;; (setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+;; (defun ido-disable-line-truncation () (set (make-local-variable 'truncate-lines) nil))
+;;   (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
+;;   (defun ido-define-keys () ;; C-n/p is more intuitive in vertical layout
+;;     (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
+;;     (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
+;; (add-hook 'ido-setup-hook 'ido-define-keys)
+(ido-vertical-mode 1)
 
 ;; ;;make ido complete almost anything (except the stuff where it shouldn'
 ;; (defvar ido-enable-replace-completing-read t

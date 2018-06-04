@@ -1,16 +1,18 @@
 
 ;; ----- smex-history -----
 (
+ ido-vertical-mode
+ package-install
  eval-region
  cd
  5x5
  arp
  dbx
- dig
- erc
 )
 
 ;; ----- smex-data -----
 (
  (eval-region . 1)
+ (package-install . 1)
+ (ido-vertical-mode . 1)
 )
