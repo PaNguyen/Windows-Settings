@@ -25,7 +25,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -63,7 +63,7 @@
 
 (setq initial-scratch-message "")
 (setq initial-major-mode 'text-mode)
-(add-hook 'text-mode-hook 'turn-on-auto-fill)
+;; (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
 ;; Open new empty buffer without prompting for name
 (defun xah-new-empty-buffer ()
@@ -187,73 +187,125 @@ Version 2017-11-01"
 
 (server-start)
 
+;;BEGIN IDO
+
 ;; better buffer switch
-;; (require 'ido)
+(require 'ido)
+(ido-mode t)
 ;; (ido-mode 'buffers) ;; only use this line to turn off ido for file names!
-;; (setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*"
-;;                            "*Messages*" "Async Shell Command" "*Warnings*" "*Help*"))
-;; (require 'ido-better-flex)
-;; (ido-better-flex/enable)
+(setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*"
+                           "*Messages*" "Async Shell Command" "*Warnings*" "*Help*"))
+(require 'ido-better-flex)
+(ido-better-flex/enable)
 
-(require 'helm)
-(require 'helm-config)
+(global-set-key
+ "\M-x"
+ (lambda ()
+   (interactive)
+   (call-interactively
+    (intern
+     (ido-completing-read
+      "M-x "
+      (all-completions "" obarray 'commandp))))))
 
-;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
-;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
-;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-(global-unset-key (kbd "C-x c"))
+;; Display ido results vertically, rather than horizontally
+(setq ido-decorations (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]" " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+(defun ido-disable-line-truncation () (set (make-local-variable 'truncate-lines) nil))
+  (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
+  (defun ido-define-keys () ;; C-n/p is more intuitive in vertical layout
+    (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
+    (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
+(add-hook 'ido-setup-hook 'ido-define-keys)
 
-(global-set-key (kbd "M-x") 'helm-M-x)
-(setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
+;;make ido complete almost anything (except the stuff where it shouldn'
+(defvar ido-enable-replace-completing-read t
+  "If t, use ido-completing-read instead of completing-read if possible.
+    
+    Set it to nil using let in around-advice for functions where the
+    original completing-read is required.  For example, if a function
+    foo absolutely must use the original completing-read, define some
+    advice like this:
+    
+    (defadvice foo (around original-completing-read-only activate)
+      (let (ido-enable-replace-completing-read) ad-do-it))")
+;; Replace completing-read wherever possible, unless directed otherwise
+(defadvice completing-read
+    (around use-ido-when-possible activate)
+  (if (or (not ido-enable-replace-completing-read) ; Manual override disable ido
+          (and (boundp 'ido-cur-list)
+               ido-cur-list)) ; Avoid infinite loop from ido calling this
+      ad-do-it
+    (let ((allcomp (all-completions "" collection predicate)))
+      (if allcomp
+          (setq ad-return-value
+                (ido-completing-read prompt
+                                     allcomp
+                                     nil require-match initial-input hist def))
+        ad-do-it))))
+(add-hook 'dired-mode-hook
+          '(lambda ()
+             (set (make-local-variable 'ido-enable-replace-completing-read) nil)))
 
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+;;END IDO
 
-(global-set-key (kbd "C-x b") 'helm-mini)
-(setq helm-buffers-fuzzy-matching t
-      helm-recentf-fuzzy-match    t)
+;; BEGIN HELM
 
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
+;; (require 'helm)
+;; (require 'helm-config)
 
+;; ;; The default "C-x c" is quite close to "C-x C-c", which quits Emacs.
+;; ;; Changed to "C-c h". Note: We must set "C-c h" globally, because we
+;; ;; cannot change `helm-command-prefix-key' once `helm-config' is loaded.
+;; (global-set-key (kbd "C-c h") 'helm-command-prefix)
+;; (global-unset-key (kbd "C-x c"))
+
+;; (global-set-key (kbd "M-x") 'helm-M-x)
+;; (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
+;; (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+;; (global-set-key (kbd "C-x b") 'helm-mini)
+;; (setq helm-buffers-fuzzy-matching t
+;;       helm-recentf-fuzzy-match    t)
+;; (global-set-key (kbd "C-x C-f") 'helm-find-files)
 ;; (when (executable-find "ack-grep")
 ;;   (setq helm-grep-default-command "ack-grep -Hn --no-group --no-color %e %p %f"
 ;;         helm-grep-default-recurse-command "ack-grep -H --no-group --no-color %e %p %f"))
 
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+;; (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+;; (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
 
-(when (executable-find "curl")
-  (setq helm-google-suggest-use-curl-p t))
+;; (when (executable-find "curl")
+;;   (setq helm-google-suggest-use-curl-p t))
 
-(setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-      helm-ff-file-name-history-use-recentf t
-      helm-echo-input-in-header-line t)
+;; (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+;;       helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+;;       helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+;;       helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+;;       helm-ff-file-name-history-use-recentf t
+;;       helm-echo-input-in-header-line t)
 
-(defun spacemacs//helm-hide-minibuffer-maybe ()
-  "Hide minibuffer in Helm session if we use the header line as input field."
-  (when (with-helm-buffer helm-echo-input-in-header-line)
-    (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-      (overlay-put ov 'window (selected-window))
-      (overlay-put ov 'face
-                   (let ((bg-color (face-background 'default nil)))
-                     `(:background ,bg-color :foreground ,bg-color)))
-      (setq-local cursor-type nil))))
-
-
-(add-hook 'helm-minibuffer-set-up-hook
-          'spacemacs//helm-hide-minibuffer-maybe)
-
-(setq helm-autoresize-max-height 0)
-(setq helm-autoresize-min-height 20)
-(helm-autoresize-mode 1)
-
-(helm-mode 1)
+;; (defun spacemacs//helm-hide-minibuffer-maybe ()
+;;   "Hide minibuffer in Helm session if we use the header line as input field."
+;;   (when (with-helm-buffer helm-echo-input-in-header-line)
+;;     (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
+;;       (overlay-put ov 'window (selected-window))
+;;       (overlay-put ov 'face
+;;                    (let ((bg-color (face-background 'default nil)))
+;;                      `(:background ,bg-color :foreground ,bg-color)))
+;;       (setq-local cursor-type nil))))
 
 
+;; (add-hook 'helm-minibuffer-set-up-hook
+;;           'spacemacs//helm-hide-minibuffer-maybe)
+
+;; (setq helm-autoresize-max-height 0)
+;; (setq helm-autoresize-min-height 20)
+;; (helm-autoresize-mode 1)
+
+;; (helm-mode 1)
+
+
+;;END HELM
 
 ;; ;;haskell
 ;; ;;https://github.com/serras/emacs-haskell-tutorial/blob/master/tutorial.md
