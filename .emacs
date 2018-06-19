@@ -25,7 +25,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (crm-custom ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -205,9 +205,17 @@ Version 2017-11-01"
 ;; This is your old M-x.
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
-;;For any case where ido cannot be used, there is another older mode called icomplete-mode that integrates with standard emacs completion and adds some ido-like behavior.
+;;For any case where ido cannot be used, there is another older mode called icomplete-mode
+;;that integrates with standard emacs completion and adds some ido-like behavior.
 (require 'icomplete)
 (icomplete-mode 1)
+
+;;Some commands, such as describe-face, use completing-read-multiple instead of
+;;completing-read. You can get ido completion for these commands with crm-custom-mode,
+;;which replaces completing-read-multiple with repeated calls to completing-read,
+;;which would then use ido thanks to ido-ubiquitous-mode. 
+(require 'crm-custom)
+(crm-custom-mode 1)
 
 ;; (ido-mode 'buffers) ;; only use this line to turn off ido for file names!
 (setq ido-ignore-buffers '("^ " "*Completions*" "*Shell Command Output*"
