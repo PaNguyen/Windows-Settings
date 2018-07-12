@@ -3,8 +3,8 @@
 #NoEnv
 SendMode Input
 
-Capslock::Ctrl
-Ctrl::Capslock
+Capslock::LCtrl
+LCtrl::Capslock
 
 ; Capslock = Escape key, unless its used with another key, where it acts as Ctrl.
 ; Capslock::
