@@ -25,7 +25,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (crm-custom ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (flymd crm-custom ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -438,3 +438,12 @@ Version 2017-11-01"
   (local-set-key (kbd "C-M-b") 'nxml-backward-element)
   )
 (add-hook 'nxml-mode-hook 'my-nxml-mode-setup t)
+
+
+;;flymd
+ (defun my-flymd-browser-function (url)
+   (let ((browse-url-browser-function 'browse-url-firefox)
+         (file-url (concat "file:///" url)))
+     (browse-url file-url)))
+(setq flymd-browser-open-function 'my-flymd-browser-function)
+(setq flymd-output-directory "C:/tmp")
