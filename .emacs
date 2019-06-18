@@ -8,6 +8,18 @@
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 (package-initialize) ;; You might already have this line
 
+;; Open shell on launch
+(add-hook 'emacs-startup-hook
+  (lambda ()
+    (let (
+        (currentbuf (get-buffer-window (current-buffer)))
+        (newbuf     (generate-new-buffer-name "*shell*"))
+        )
+    (generate-new-buffer newbuf)
+    (set-window-dedicated-p currentbuf nil)
+    (set-window-buffer currentbuf newbuf)
+    (shell newbuf))))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -56,6 +68,22 @@
 (require 'powerline)
 ;;(require 'camelCase-mode)
 ;;(camelCase-mode)
+
+;; switch to string mode in re-builder
+(require 're-builder)
+(setq reb-re-syntax 'string)
+;; re-builder C-c C-w always copies as string regardless of mode
+;; so combining it with query-replace-regexp is onerous
+;; https://www.emacswiki.org/emacs/ReBuilder
+;; (defun reb-query-replace (to-string)
+;;       "Replace current RE from point with `query-replace-regexp'."
+;;       (interactive
+;;        (progn (barf-if-buffer-read-only)
+;;               (list (query-replace-read-to (reb-target-binding reb-regexp)
+;;                                            "Query replace"  t))))
+;;       (with-current-buffer reb-target-buffer
+;;         (query-replace-regexp (reb-target-binding reb-regexp) to-string)))
+(require 're-builder+)
 
 ;; disable start screen
 (setq inhibit-startup-message t)
