@@ -215,6 +215,11 @@ Version 2017-11-01"
 
 (server-start)
 
+;; https://addons.mozilla.org/en-US/firefox/addon/edit-with-emacs1/
+;; https://wikemacs.org/wiki/Edit-server.el
+(require 'edit-server)
+(edit-server-start)
+
 ;;BEGIN IDO
 
 ;; better buffer switch
