@@ -45,4 +45,10 @@ flycheck_*.el
 .dir-locals.el
 
 .emacs.d/recentf
-.emacs.d/server
+.emacs.d/server/
+.emacs.d/server/server/
+.emacs.d/smex-items
+.emacs.d/ido.last
+.history
+.viminfo
+.gitconfig
