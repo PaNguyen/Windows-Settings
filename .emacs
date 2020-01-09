@@ -37,13 +37,42 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (flymd crm-custom ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (impatient-mode ztree projectile xah-find flymd crm-custom ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;; automatically refresh buffers if changed on disk
+;; (global-auto-revert-mode t)
+
+;;magit
+;;https://emacs.stackexchange.com/questions/43643/magit-how-to-show-differences-within-lines
+;; (setq magit-diff-refine-hunk (quote all))
+
+;;ediff
+;;http://pragmaticemacs.com/emacs/visualise-and-copy-differences-between-files/
+(require 'ediff)
+;; don't start another frame
+;; this is done by default in preluse
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+;; put windows side by side
+(setq ediff-split-window-function (quote split-window-horizontally))
+;;revert windows on exit - needs winner mode
+(winner-mode)
+(add-hook 'ediff-after-quit-hook-internal 'winner-undo)
+;;ignore whitespace only diffs
+;; (setq ediff-diff-options "-w")
+;; (setq-default ediff-ignore-similar-regions t)
+;; (setq-default ediff-highlight-all-diffs nil)
+
+
+;;projectile
+(projectile-mode +1)
+(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 ;; show line numbers
 ;; (global-linum-mode t)
@@ -474,9 +503,21 @@ Version 2017-11-01"
 
 
 ;;flymd
- (defun my-flymd-browser-function (url)
-   (let ((browse-url-browser-function 'browse-url-firefox)
-         (file-url (concat "file:///" url)))
-     (browse-url file-url)))
-(setq flymd-browser-open-function 'my-flymd-browser-function)
-(setq flymd-output-directory "C:/tmp")
+;;this doesn't work with firefox 68.0 and up
+;;https://github.com/mola-T/flymd/issues/27
+;;  (defun my-flymd-browser-function (url)
+;;    (let ((browse-url-browser-function 'browse-url-firefox)
+;;          (file-url (concat "file:///" url)))
+;;      (browse-url file-url)))
+;; (setq flymd-browser-open-function 'my-flymd-browser-function)
+;; (setq flymd-output-directory "C:/tmp")
+
+
+;;impatient-mode
+(defun markdown-html (buffer)
+  (princ (with-current-buffer buffer
+    (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
+  (current-buffer)))
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/vmd-mode-master")
+(require 'vmd-mode)
