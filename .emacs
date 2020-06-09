@@ -37,7 +37,7 @@
  '(haskell-tags-on-save t)
  '(package-selected-packages
    (quote
-    (impatient-mode ztree projectile xah-find flymd crm-custom ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
+    (impatient-mode ztree xah-find flymd crm-custom ido-vertical-mode smex ido-completing-read+ ido-ubiquitous powershell json-mode magit helm flx-ido markdown-mode ahk-mode framemove powerline blackboard-theme intero flymake-hlint omnisharp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -70,9 +70,9 @@
 
 
 ;;projectile
-(projectile-mode +1)
-(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+;;(projectile-mode +1)
+;;(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+;;(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 
 ;; show line numbers
 ;; (global-linum-mode t)
